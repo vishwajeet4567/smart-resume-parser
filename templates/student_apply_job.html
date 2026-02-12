@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Apply Job | Smart ATS Portal{% endblock %}
+{% block content %}
+<section class="card fade-up">
+  <div class="section-head">
+    <h1>Apply for {{ job["title"] }}</h1>
+    <p>Select your resume/document and submit your application.</p>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="form-grid">
+    <label for="resume">Document</label>
+    <input id="resume" name="resume" type="file" accept=".pdf,.doc,.docx,.txt" required>
+    <small class="helper-text">Accepted formats: PDF, DOC, DOCX, TXT</small>
+
+    <div class="job-actions">
+      <a class="btn-outline" href="/student/jobs/{{ job['id'] }}">Back to Job Detail</a>
+      <button type="submit" class="btn-primary">Submit Application</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Jobs | Smart ATS Portal{% endblock %}
+{% block content %}
+<section class="card fade-up">
+  <div class="section-head">
+    <h1>Open Jobs</h1>
+    <p>Browse and compare your profile against role requirements.</p>
+  </div>
+
+  <div class="toolbar">
+    <input id="jobSearch" type="text" placeholder="Search by title, skill, or description...">
+    <span id="jobCount" class="pill">{{ jobs|length }} jobs</span>
+  </div>
+
+  <div id="jobsList" class="job-grid">
+    {% for job in jobs %}
+      <article class="job-card" data-title="{{ job['title']|lower }}" data-desc="{{ (job['description'] or '')|lower }}" data-skills="{{ (job['skills'] or '')|lower }}">
+        <h3>{{ job["title"] }}</h3>
+        <p>{{ job["description"] or "No description provided." }}</p>
+        <p><strong>Skills:</strong> {{ job["skills"] or "Not specified" }}</p>
+        <p><strong>Apply By:</strong> {{ job["application_deadline"] or "-" }}</p>
+        <div class="job-actions">
+          {% if role == "student" %}
+            <a class="btn-primary" href="/upload_resume_individual">Run Individual ATS</a>
+          {% elif role == "recruiter" %}
+            <a class="btn-outline" href="/recruiter/jobs/{{ job['id'] }}">View Details</a>
+            <a class="btn-primary" href="/recruiter/jobs/{{ job['id'] }}/edit">Edit Job</a>
+          {% endif %}
+          {% if job["skills"] %}
+            <button class="btn-outline copy-skills-btn" data-skills="{{ job['skills'] }}">Copy Skills</button>
+          {% endif %}
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+
+  {% if jobs|length == 0 %}
+    <p class="empty-note">No jobs posted yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

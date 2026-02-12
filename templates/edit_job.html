@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Edit Job | Smart ATS Portal{% endblock %}
+{% block content %}
+<section class="card fade-up">
+  <div class="section-head">
+    <h1>Edit Job</h1>
+    <p>Update your posted role details and deadline.</p>
+  </div>
+
+  <form method="post" class="form-grid">
+    <label for="title">Job Title</label>
+    <input id="title" name="title" type="text" value="{{ job['title'] }}" required>
+
+    <label for="description">Job Description</label>
+    <textarea id="description" name="description" rows="6" required>{{ job["description"] }}</textarea>
+    <small id="descCounter" class="counter">0 characters</small>
+
+    <label for="skills">Required Skills</label>
+    <input id="skills" name="skills" type="text" value="{{ job['skills'] or '' }}">
+    <small class="helper-text">Tip: separate skills with commas.</small>
+
+    <label for="application_deadline">Application Deadline</label>
+    <input id="application_deadline" name="application_deadline" type="date" value="{{ job['application_deadline'] or '' }}">
+
+    <div class="job-actions">
+      <a class="btn-outline" href="/recruiter/jobs/{{ job['id'] }}">Cancel</a>
+      <button type="submit" class="btn-primary">Save Changes</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

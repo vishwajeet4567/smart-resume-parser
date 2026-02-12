@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Post Job | Smart ATS Portal{% endblock %}
+{% block content %}
+<section class="card fade-up">
+  <div class="section-head">
+    <h1>Post a New Job</h1>
+    <p>Publish clear job details to get better ATS matches.</p>
+  </div>
+
+  <form method="post" class="form-grid">
+    <label for="title">Job Title</label>
+    <input id="title" name="title" type="text" placeholder="Backend Python Developer" required>
+
+    <label for="description">Job Description</label>
+    <textarea id="description" name="description" rows="6" placeholder="Write responsibilities, qualifications, and experience requirements..." required></textarea>
+    <small id="descCounter" class="counter">0 characters</small>
+
+    <label for="skills">Required Skills</label>
+    <input id="skills" name="skills" type="text" placeholder="Python, Flask, SQL, API Design">
+    <small class="helper-text">Tip: separate skills with commas.</small>
+
+    <label for="application_deadline">Application Deadline</label>
+    <input id="application_deadline" name="application_deadline" type="date">
+    <small class="helper-text">Optional: students can see this apply-by date.</small>
+
+    <button type="submit" class="btn-primary">Post Job</button>
+  </form>
+</section>
+{% endblock %}

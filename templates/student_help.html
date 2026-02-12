@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Help | Smart ATS Portal{% endblock %}
+{% block content %}
+<section class="card fade-up">
+  <div class="section-head">
+    <h1>Help</h1>
+    <p>Quick guidance for using the student portal.</p>
+  </div>
+
+  <div class="help-grid">
+    <article class="help-item">
+      <h3>1. Home</h3>
+      <p>View all recruiter-posted jobs with descriptions.</p>
+    </article>
+    <article class="help-item">
+      <h3>2. Job Profile</h3>
+      <p>Browse jobs and open full details before analysis.</p>
+    </article>
+    <article class="help-item">
+      <h3>3. Profile</h3>
+      <p>Save details like LinkedIn, skills, and portfolio links.</p>
+    </article>
+    <article class="help-item">
+      <h3>4. ATS Match</h3>
+      <p>Upload resume and run individual ATS quality analysis.</p>
+    </article>
+    <article class="help-item">
+      <h3>5. Individual ATS</h3>
+      <p>Upload resume and check ATS score without selecting any job.</p>
+    </article>
+  </div>
+
+  <div class="job-actions">
+    <a class="btn-outline" href="/upload_resume_individual">Individual ATS Check</a>
+    <a class="btn-primary" href="/student/job-profile">Open Job Profile</a>
+  </div>
+</section>
+{% endblock %}

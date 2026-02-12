@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Student Home | Smart ATS Portal{% endblock %}
+{% block content %}
+<section class="linkedin-wrap fade-up">
+  <aside class="linkedin-left card">
+    <div class="linkedin-cover"></div>
+    <div class="linkedin-profile">
+      <div class="linkedin-avatar">{{ (profile["full_name"] or session.get("name", "S"))[0]|upper }}</div>
+      <h2>{{ profile["full_name"] or session.get("name", "Student") }}</h2>
+      <p>{{ session.get("user") }}</p>
+    </div>
+    <div class="linkedin-metrics">
+      <div>
+        <span>Total Jobs</span>
+        <strong>{{ total_jobs }}</strong>
+      </div>
+      <div>
+        <span>Resume Status</span>
+        <strong>{{ "Uploaded" if resume_uploaded else "Pending" }}</strong>
+      </div>
+    </div>
+    {% if resume_uploaded %}
+      <p class="helper-text">Latest resume: <strong>{{ resume_filename }}</strong></p>
+    {% endif %}
+  </aside>
+
+  <section class="linkedin-feed">
+    <article class="card linkedin-compose">
+      <h1>Student Feed</h1>
+      <p>Discover jobs shared by recruiters and open details to apply.</p>
+    </article>
+
+    <article class="card">
+      <div class="section-head">
+        <h2>Recommended Jobs</h2>
+      </div>
+      <div class="job-grid">
+        {% for job in jobs %}
+          <article class="job-card linkedin-job">
+            <div class="linkedin-job-head">
+              <h3>{{ job["title"] }}</h3>
+              <span class="pill">Open Role</span>
+            </div>
+            <p>{{ job["description"] or "No description provided." }}</p>
+            <p><strong>Skills:</strong> {{ job["skills"] or "Not specified" }}</p>
+            <div class="job-actions">
+              <a class="btn-outline" href="/student/jobs/{{ job['id'] }}">View Job Detail</a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+      {% if jobs|length == 0 %}
+        <p class="empty-note">No jobs posted yet.</p>
+      {% endif %}
+    </article>
+  </section>
+
+  <aside class="linkedin-right card">
+    <h3>Quick Access</h3>
+    <a class="btn-outline linkedin-side-link" href="/student/job-profile">Browse All Jobs</a>
+    <a class="btn-outline linkedin-side-link" href="/student/profile">Update Profile</a>
+    <a class="btn-outline linkedin-side-link" href="/student/help">Help Center</a>
+
+    <hr>
+    <h3>Career Tips</h3>
+    <ul class="linkedin-tips">
+      <li>Use job-specific keywords in your summary.</li>
+      <li>Highlight measurable impact in projects.</li>
+      <li>Keep resume format clean and ATS friendly.</li>
+    </ul>
+  </aside>
+</section>
+{% endblock %}

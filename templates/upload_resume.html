@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Upload Resume | Smart ATS Portal{% endblock %}
+{% block content %}
+<section class="card fade-up">
+  <div class="section-head">
+    <h1>Job-Based Resume ATS Check</h1>
+    <p>Upload resume, choose a target job role, and run ATS match analysis.</p>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="form-grid">
+    <label for="job_id">Target Job Profile</label>
+    <select id="job_id" name="job_id" required>
+      <option value="">Select a job</option>
+      {% for job in jobs %}
+        <option value="{{ job['id'] }}" {% if selected_job_id == job['id'] %}selected{% endif %}>
+          {{ job["title"] }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <label for="resume">Resume File</label>
+    <input id="resume" name="resume" type="file" accept=".pdf,.doc,.docx,.txt" required>
+    <small class="helper-text">Accepted formats: PDF, DOC, DOCX, TXT</small>
+
+    <button type="submit" class="btn-primary">Upload and Run ATS AI Check</button>
+  </form>
+
+  {% if jobs|length == 0 %}
+    <p class="empty-note">No job profiles available yet. Ask a recruiter to post jobs.</p>
+  {% endif %}
+</section>
+
+{% if analysis %}
+<section class="card fade-up">
+  <div class="section-head">
+    <h2>AI/ML ATS Result</h2>
+    <p>Target Role: <strong>{{ analysis["job_title"] }}</strong></p>
+  </div>
+
+  <div class="score-wrap">
+    <div class="score-ring" data-score="{{ analysis['score'] }}">
+      <span>{{ analysis["score"] }}%</span>
+    </div>
+    <div>
+      <h3>Current ATS Score: {{ analysis["score"] }}%</h3>
+      <p class="helper-text">This score is based on ML similarity and keyword match.</p>
+    </div>
+  </div>
+
+  <h3>Missing Keywords</h3>
+  <div class="tag-list">
+    {% if analysis["missing"] %}
+      {% for word in analysis["missing"] %}
+        <span class="tag">{{ word }}</span>
+      {% endfor %}
+    {% else %}
+      <span class="tag tag-good">Strong keyword match. Very few gaps found.</span>
+    {% endif %}
+  </div>
+
+  <h3>Suggestions To Improve</h3>
+  <ul class="suggestion-list">
+    {% for item in analysis["suggestions"] %}
+      <li>{{ item }}</li>
+    {% endfor %}
+  </ul>
+
+  {% if analysis.get("llm_feedback") %}
+    <div class="feedback-shell llm-feedback-widget">
+      <div class="feedback-head">
+        <h3>Gemma 3 (Local) Feedback</h3>
+        <span class="pill feedback-count">0 tips</span>
+      </div>
+      <p class="helper-text">Actionable recommendations extracted into interactive cards.</p>
+      <div class="feedback-grid" aria-live="polite"></div>
+      <details class="feedback-raw">
+        <summary>View full model response</summary>
+        <pre class="resume-draft llm-feedback-raw" style="white-space: pre-wrap;">{{ analysis["llm_feedback"] }}</pre>
+      </details>
+    </div>
+  {% endif %}
+
+  <div class="ask-box">
+    <p><strong>Shall I make a better resume draft with a higher ATS-aligned structure?</strong></p>
+    <form method="post" action="/resume/improve">
+      <button type="submit" class="btn-primary">Yes, Generate Better Resume</button>
+    </form>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

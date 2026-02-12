@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Profile | Smart ATS Portal{% endblock %}
+{% block content %}
+<section class="card fade-up">
+  <div class="section-head">
+    <h1>Student Profile</h1>
+    <p>Update your personal and professional details.</p>
+  </div>
+
+  <form method="post" class="form-grid">
+    <label for="full_name">Full Name</label>
+    <input id="full_name" name="full_name" type="text" value="{{ profile['full_name'] or '' }}" placeholder="Your full name">
+
+    <label for="phone">Phone</label>
+    <input id="phone" name="phone" type="text" value="{{ profile['phone'] or '' }}" placeholder="+1 555 123 4567">
+
+    <label for="location">Location</label>
+    <input id="location" name="location" type="text" value="{{ profile['location'] or '' }}" placeholder="City, Country">
+
+    <label for="linkedin">LinkedIn</label>
+    <input id="linkedin" name="linkedin" type="url" value="{{ profile['linkedin'] or '' }}" placeholder="https://linkedin.com/in/username">
+
+    <label for="portfolio">Portfolio / GitHub</label>
+    <input id="portfolio" name="portfolio" type="url" value="{{ profile['portfolio'] or '' }}" placeholder="https://github.com/username">
+
+    <label for="skills">Key Skills</label>
+    <input id="skills" name="skills" type="text" value="{{ profile['skills'] or '' }}" placeholder="Python, SQL, Flask, Machine Learning">
+
+    <label for="about">About</label>
+    <textarea id="about" name="about" rows="5" placeholder="Short summary about your profile">{{ profile['about'] or '' }}</textarea>
+
+    <button type="submit" class="btn-primary">Save Profile</button>
+  </form>
+</section>
+{% endblock %}

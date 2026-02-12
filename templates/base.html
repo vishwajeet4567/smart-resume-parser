@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Smart ATS Portal{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+
+  <header class="topbar">
+    <a class="brand" href="{{ '/recruiter' if role == 'recruiter' else ('/student' if role == 'student' else '/') }}">
+      <span class="brand-dot"></span>
+      <span>Smart ATS Portal</span>
+    </a>
+    <nav class="topnav">
+      {% if is_logged_in %}
+        {% if role == "recruiter" %}
+          <a href="/recruiter">Dashboard</a>
+          <a href="/jobs">Jobs</a>
+          <a href="/post_job">Post Job</a>
+        {% else %}
+          <a href="/student">Home</a>
+          <a href="/student/job-profile">Job Profile</a>
+          <a href="/upload_resume_individual">Individual ATS</a>
+          <a href="/student/profile">Profile</a>
+          <a href="/student/help">Help</a>
+        {% endif %}
+        <a class="btn-outline" href="/logout">Logout</a>
+      {% else %}
+        <a href="/">Login</a>
+        <a href="/register">Register</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

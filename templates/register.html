@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Register | Smart ATS Portal{% endblock %}
+{% block content %}
+<section class="card auth-card fade-up">
+  <div class="section-head">
+    <h1>Create Account</h1>
+    <p>Choose your role and start using the portal.</p>
+  </div>
+
+  <form method="post" class="form-grid">
+    <label for="name">Full Name</label>
+    <input id="name" name="name" type="text" placeholder="Jane Doe" required>
+
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" placeholder="you@example.com" required>
+
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" minlength="4" placeholder="Minimum 4 characters" required>
+
+    <label for="role">Role</label>
+    <select id="role" name="role" required>
+      <option value="student">Student</option>
+      <option value="recruiter">Recruiter</option>
+    </select>
+
+    <button type="submit" class="btn-primary">Register</button>
+  </form>
+
+  <p class="helper-text">Already registered? <a href="/">Login</a>.</p>
+</section>
+{% endblock %}

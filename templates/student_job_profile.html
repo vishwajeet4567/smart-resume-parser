@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Job Profile | Smart ATS Portal{% endblock %}
+{% block content %}
+<section class="card fade-up">
+  <div class="section-head">
+    <h1>Job Profile</h1>
+    <p>Click any job to view full details.</p>
+  </div>
+
+  <div class="toolbar">
+    <input id="jobSearch" type="text" placeholder="Search jobs...">
+    <span id="jobCount" class="pill">{{ jobs|length }} jobs</span>
+  </div>
+
+  <div id="jobsList" class="job-grid">
+    {% for job in jobs %}
+      <article class="job-card" data-title="{{ job['title']|lower }}" data-desc="{{ (job['description'] or '')|lower }}" data-skills="{{ (job['skills'] or '')|lower }}">
+        <h3>{{ job["title"] }}</h3>
+        <p><strong>Skills:</strong> {{ job["skills"] or "Not specified" }}</p>
+        <div class="job-actions">
+          <a class="btn-outline" href="/student/jobs/{{ job['id'] }}">View Job Detail</a>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+  {% if jobs|length == 0 %}
+    <p class="empty-note">No jobs available.</p>
+  {% endif %}
+</section>
+{% endblock %}

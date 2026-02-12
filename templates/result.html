@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}ATS Result | Smart ATS Portal{% endblock %}
+{% block content %}
+<section class="card fade-up">
+  <div class="section-head">
+    <h1>ATS Match Result</h1>
+    <p>
+      Resume:
+      <strong>{{ resume_filename or "uploaded resume" }}</strong>
+      {% if job %}vs Job: <strong>{{ job["title"] }}</strong>{% endif %}
+    </p>
+  </div>
+
+  <div class="score-wrap">
+    <div class="score-ring" data-score="{{ score }}">
+      <span id="scoreText">{{ score }}%</span>
+    </div>
+    <div>
+      <h2>{{ score }}% Match</h2>
+      <p class="helper-text">Higher score means better keyword and content alignment.</p>
+    </div>
+  </div>
+
+  <h3>Missing Keywords</h3>
+  <div class="tag-list">
+    {% if missing %}
+      {% for word in missing %}
+        <span class="tag">{{ word }}</span>
+      {% endfor %}
+    {% else %}
+      <span class="tag tag-good">Great match. No major keyword gaps found.</span>
+    {% endif %}
+  </div>
+
+  <div class="job-actions">
+    <a class="btn-outline" href="/jobs">Back to Jobs</a>
+    <a class="btn-primary" href="/upload_resume_individual">Upload New Resume</a>
+  </div>
+</section>
+{% endblock %}

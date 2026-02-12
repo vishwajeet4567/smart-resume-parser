@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Job Detail | Smart ATS Portal{% endblock %}
+{% block content %}
+<section class="card fade-up">
+  <div class="section-head">
+    <h1>{{ job["title"] }}</h1>
+    <p>Detailed recruiter posting.</p>
+  </div>
+
+  <p><strong>Description:</strong></p>
+  <p>{{ job["description"] or "No description provided." }}</p>
+
+  <p><strong>Required Skills:</strong> {{ job["skills"] or "Not specified" }}</p>
+  <p><strong>Posted By:</strong> {{ job["recruiter_email"] }}</p>
+
+  <div class="job-actions">
+    <a class="btn-outline" href="/student/job-profile">Back to Job Profile</a>
+    <a class="btn-primary" href="/student/jobs/{{ job['id'] }}/apply">Apply Job</a>
+  </div>
+</section>
+{% endblock %}

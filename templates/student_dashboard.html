@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Student Dashboard | Smart ATS Portal{% endblock %}
+{% block content %}
+<section class="hero fade-up">
+  <h1>Student Dashboard</h1>
+  <p>Explore jobs and check ATS compatibility before applying.</p>
+</section>
+
+<section class="stat-grid fade-up">
+  <article class="card stat-card">
+    <h3>Available Jobs</h3>
+    <p class="stat">{{ total_jobs }}</p>
+  </article>
+  <article class="card stat-card">
+    <h3>Resume Status</h3>
+    {% if resume_uploaded %}
+      <p class="helper-text"><strong>Uploaded:</strong> {{ resume_filename }}</p>
+    {% else %}
+      <p class="helper-text">No resume uploaded yet.</p>
+    {% endif %}
+  </article>
+</section>
+
+<section class="card fade-up">
+  <div class="section-head">
+    <h2>Quick Actions</h2>
+  </div>
+  <div class="job-actions">
+    {% if resume_uploaded %}
+      <a class="btn-primary" href="/jobs">Browse Jobs</a>
+      <a class="btn-outline" href="/upload_resume_individual">Replace Resume</a>
+    {% else %}
+      <a class="btn-primary" href="/upload_resume_individual">Upload Resume</a>
+      <a class="btn-outline" href="/jobs">Browse Jobs</a>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

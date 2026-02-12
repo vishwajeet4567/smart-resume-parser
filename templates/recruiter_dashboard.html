@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Recruiter Dashboard | Smart ATS Portal{% endblock %}
+{% block content %}
+<section class="hero fade-up">
+  <h1>Recruiter Dashboard</h1>
+  <p>Track your postings and publish new opportunities.</p>
+</section>
+
+<section class="stat-grid fade-up">
+  <article class="card stat-card">
+    <h3>Your Posted Jobs</h3>
+    <p class="stat">{{ my_jobs }}</p>
+  </article>
+  <article class="card stat-card">
+    <h3>Total Jobs on Portal</h3>
+    <p class="stat">{{ total_jobs }}</p>
+  </article>
+</section>
+
+<section class="card fade-up">
+  <div class="section-head">
+    <h2>Job Performance</h2>
+    <p>Applicants and average ATS score per posted role.</p>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Job Title</th>
+          <th>Deadline</th>
+          <th>Applicants</th>
+          <th>Average Score</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in job_stats %}
+          <tr>
+            <td>{{ row["title"] }}</td>
+            <td>{{ row["application_deadline"] or "-" }}</td>
+            <td>{{ row["applicants"] }}</td>
+            <td>{{ "%.2f"|format(row["avg_score"]) if row["avg_score"] is not none else "-" }}</td>
+            <td>
+              <a class="btn-outline" href="/recruiter/jobs/{{ row['id'] }}">View</a>
+              <a class="btn-primary" href="/recruiter/jobs/{{ row['id'] }}/edit">Edit</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if job_stats|length == 0 %}
+    <p class="empty-note">Post a job to start receiving applicants.</p>
+  {% endif %}
+</section>
+
+<section class="card fade-up">
+  <div class="section-head">
+    <h2>Recent Applicants</h2>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Job</th>
+          <th>ATS Score</th>
+          <th>Analyzed At</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in recent_applications %}
+          <tr>
+            <td>{{ row["student_email"] }}</td>
+            <td>{{ row["job_title"] }}</td>
+            <td>{{ row["score"] ~ "%" if row["score"] is not none else "Applied" }}</td>
+            <td>{{ row["created_at"] }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if recent_applications|length == 0 %}
+    <p class="empty-note">No student analyses yet.</p>
+  {% endif %}
+</section>
+
+<section class="card fade-up">
+  <div class="section-head">
+    <h2>Quick Actions</h2>
+  </div>
+  <div class="job-actions">
+    <a class="btn-primary" href="/post_job">Post New Job</a>
+    <a class="btn-outline" href="/jobs">View All Jobs</a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Improved Resume | Smart ATS Portal{% endblock %}
+{% block content %}
+<section class="card fade-up">
+  <div class="section-head">
+    <h1>AI Resume Improvement</h1>
+    <p>Target Job: <strong>{{ job["title"] }}</strong></p>
+  </div>
+
+  <div class="stat-grid">
+    <article class="card stat-card">
+      <h3>Original ATS Score</h3>
+      <p class="stat">{{ original_score }}%</p>
+    </article>
+    <article class="card stat-card">
+      <h3>Improved ATS Score</h3>
+      <p class="stat">{{ improved_score }}%</p>
+    </article>
+  </div>
+
+  <h3>Remaining Missing Keywords</h3>
+  <div class="tag-list">
+    {% if improved_missing %}
+      {% for word in improved_missing %}
+        <span class="tag">{{ word }}</span>
+      {% endfor %}
+    {% else %}
+      <span class="tag tag-good">Excellent alignment with target job profile.</span>
+    {% endif %}
+  </div>
+
+  <h3>Further Improvement Tips</h3>
+  <ul class="suggestion-list">
+    {% for tip in improved_suggestions %}
+      <li>{{ tip }}</li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section class="card fade-up">
+  <div class="section-head">
+    <h2>Generated ATS-Optimized Draft</h2>
+    <p>Review and personalize with your exact achievements before applying.</p>
+  </div>
+  <textarea class="resume-draft" rows="22" readonly>{{ improved_text }}</textarea>
+
+  <div class="job-actions">
+    <form method="post" action="/resume/use-improved">
+      <button type="submit" class="btn-primary">Use This Improved Draft</button>
+    </form>
+    <a class="btn-outline" href="/upload_resume_individual">Back to Upload Resume</a>
+  </div>
+</section>
+{% endblock %}
