@@ -1,22 +1,74 @@
 {% extends "base.html" %}
-{% block title %}Job Details | Smart ATS Portal{% endblock %}
+{% block title %}{{ job["title"] }} | Smart ATS Portal{% endblock %}
 {% block content %}
+
+<section class="hero fade-up">
+  <h1>{{ job["title"] }}</h1>
+  <p>Job details and all applicants for this role.</p>
+</section>
+
 <section class="card fade-up">
   <div class="section-head">
-    <h1>{{ job["title"] }}</h1>
-    <p>Your posted job details.</p>
+    <h2>Job Details</h2>
+    <div class="job-actions">
+      <a class="btn-outline" href="/recruiter">← Dashboard</a>
+      <a class="btn-primary" href="/recruiter/jobs/{{ job['id'] }}/edit">Edit Job</a>
+    </div>
   </div>
 
   <p><strong>Description:</strong></p>
-  <p>{{ job["description"] or "No description provided." }}</p>
+  <p style="white-space: pre-wrap;">{{ job["description"] or "No description provided." }}</p>
 
-  <p><strong>Required Skills:</strong> {{ job["skills"] or "Not specified" }}</p>
-  <p><strong>Application Deadline:</strong> {{ job["application_deadline"] or "-" }}</p>
+  <p style="margin-top:1rem;"><strong>Required Skills:</strong> {{ job["skills"] or "Not specified" }}</p>
   <p><strong>Posted By:</strong> {{ job["recruiter_email"] }}</p>
-
-  <div class="job-actions">
-    <a class="btn-outline" href="/recruiter">Back to Dashboard</a>
-    <a class="btn-primary" href="/recruiter/jobs/{{ job['id'] }}/edit">Edit Job</a>
-  </div>
 </section>
+
+<section class="card fade-up">
+  <div class="section-head">
+    <h2>Applicants ({{ applicants | length }})</h2>
+    <p>Showing one entry per student — their most recent submission.</p>
+  </div>
+
+  {% if applicants %}
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Student Email</th>
+          <th>ATS Score</th>
+          <th>Applied At</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in applicants %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ row["student_email"] }}</td>
+          <td>
+            {% if row["score"] is not none %}
+              <span class="{% if row['score'] >= 70 %}score-high{% elif row['score'] >= 40 %}score-mid{% else %}score-low{% endif %}">
+                {{ "%.1f"|format(row["score"]) }}%
+              </span>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td>{{ row["created_at"] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="empty-note">No applicants yet for this job.</p>
+  {% endif %}
+</section>
+
+<style>
+  .score-high { color: #22c55e; font-weight: 700; }
+  .score-mid  { color: #f59e0b; font-weight: 700; }
+  .score-low  { color: #ef4444; font-weight: 700; }
+  .section-head { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; }
+</style>
 {% endblock %}

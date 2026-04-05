@@ -478,7 +478,7 @@ def recruiter_dash():
         SELECT
             j.id,
             j.title,
-            COUNT(a.id) AS applicants,
+            COUNT(DISTINCT a.student_email) AS applicants,
             AVG(a.score) AS avg_score
         FROM jobs j
         LEFT JOIN applications a ON a.job_id = j.id
@@ -499,6 +499,14 @@ def recruiter_dash():
             j.title AS job_title
         FROM applications a
         JOIN jobs j ON j.id = a.job_id
+        JOIN (
+            SELECT student_email, job_id, MAX(created_at) AS latest
+            FROM applications
+            GROUP BY student_email, job_id
+        ) latest_apps
+        ON a.student_email = latest_apps.student_email
+        AND a.job_id = latest_apps.job_id
+        AND a.created_at = latest_apps.latest
         WHERE j.recruiter_email = ?
         ORDER BY a.created_at DESC
         LIMIT 10
@@ -778,6 +786,87 @@ def logout():
     session.clear()
     flash("You have been logged out.", "success")
     return redirect("/")
+
+
+# ---------- RECRUITER JOB VIEW & EDIT ----------
+
+@app.route("/recruiter/jobs/<int:job_id>")
+def recruiter_job_view(job_id):
+    """Shows the recruiter a detail page for one of their jobs, including all unique applicants."""
+    if not role_required("recruiter"):
+        flash("Recruiter access required.", "error")
+        return redirect("/")
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM jobs WHERE id=? AND recruiter_email=?", (job_id, session["user"]))
+    job = cur.fetchone()
+    if not job:
+        conn.close()
+        flash("Job not found or access denied.", "error")
+        return redirect("/recruiter")
+
+    # Fetch the latest application per unique student for this job
+    cur.execute(
+        """
+        SELECT
+            a.student_email,
+            a.score,
+            a.created_at
+        FROM applications a
+        JOIN (
+            SELECT student_email, MAX(created_at) AS latest
+            FROM applications
+            WHERE job_id = ?
+            GROUP BY student_email
+        ) latest_apps
+        ON a.student_email = latest_apps.student_email
+        AND a.created_at = latest_apps.latest
+        WHERE a.job_id = ?
+        ORDER BY a.score DESC
+        """,
+        (job_id, job_id),
+    )
+    applicants = cur.fetchall()
+    conn.close()
+    return render_template("recruiter_job_detail.html", job=job, applicants=applicants)
+
+
+@app.route("/recruiter/jobs/<int:job_id>/edit", methods=["GET", "POST"])
+def recruiter_job_edit(job_id):
+    """Allows a recruiter to update the title, description, and skills of one of their jobs."""
+    if not role_required("recruiter"):
+        flash("Recruiter access required.", "error")
+        return redirect("/")
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM jobs WHERE id=? AND recruiter_email=?", (job_id, session["user"]))
+    job = cur.fetchone()
+    if not job:
+        conn.close()
+        flash("Job not found or access denied.", "error")
+        return redirect("/recruiter")
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        description = request.form.get("description", "").strip()
+        skills = request.form.get("skills", "").strip()
+        if not title or not description:
+            flash("Title and description are required.", "error")
+            conn.close()
+            return redirect(f"/recruiter/jobs/{job_id}/edit")
+        cur.execute(
+            "UPDATE jobs SET title=?, description=?, skills=? WHERE id=? AND recruiter_email=?",
+            (title, description, skills, job_id, session["user"]),
+        )
+        conn.commit()
+        conn.close()
+        flash("Job updated successfully.", "success")
+        return redirect(f"/recruiter/jobs/{job_id}")
+
+    conn.close()
+    return render_template("recruiter_job_edit.html", job=job)
 
 
 # ---------- JOB POST ----------
