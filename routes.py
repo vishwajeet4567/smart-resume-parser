@@ -12,6 +12,11 @@ from db import get_db_connection
 from llm_engine import generate_general_resume_feedback
 from resume_parser import extract_resume_text
 
+"""
+This file contains the routing logic for the application.
+It appears to be part of a refactoring effort to move routes out of app.py.
+Currently, app.py acts as the main entry point and contains the active routes.
+"""
 
 def register_routes(app):
     @app.route("/upload_resume", methods=["GET", "POST"])

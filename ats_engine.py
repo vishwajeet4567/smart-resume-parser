@@ -1,27 +1,95 @@
 import re
+import spacy
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+# Step 1: Attempt to load the advanced English Language model (spaCy)
+# This model lets us recognize that words like "running" and "ran" mean the same thing ("run").
+try:
+    nlp = spacy.load("en_core_web_sm")
+except OSError:
+    # If the user hasn't downloaded the spaCy model, fallback to basic text processing
+    nlp = None
 
-def _normalize_words(text):
-    return re.findall(r"[a-zA-Z][a-zA-Z0-9+#\-.]*", (text or "").lower())
+
+def _normalize_words_spacy(text):
+    """
+    Cleans up the text by removing punctuation, stop words (like 'and', 'the'), 
+    and converts every word into its base form (lemma).
+    """
+    if not text:
+        return []
+    
+    # Make everything lowercase so "Python" matches "python"
+    text = text.lower()
+    
+    # Fallback if spaCy failed to load: just grab any sequence of letters and basic symbols using simple regex
+    if nlp is None:
+        return re.findall(r"[a-zA-Z][a-zA-Z0-9+#\-.]*", text)
+        
+    # Process the text through the NLP engine
+    doc = nlp(text)
+    
+    # Extract the base form (lemma) of every word, skipping punctuation, spaces, and useless stop words
+    words = [token.lemma_ for token in doc if not token.is_stop and not token.is_punct and not token.is_space and bool(re.match(r"^[a-z0-9+#\-.]+$", token.lemma_))]
+    return words
 
 
-def ats_score(resume_text, job_text):
+def ats_score(resume_text, job_text, job_skills=""):
+    """
+    The main algorithm to check how well a resume matches a specific job.
+    Returns:
+    1. A percentage match score (0 to 100)
+    2. A list of up to 20 important keywords the applicant missed.
+    """
     resume_text = resume_text or ""
     job_text = job_text or ""
+    job_skills = job_skills or ""
+    
+    # --- PHASE 1: Base Frequency Score (TF-IDF) ---
+    # This measures how frequently important words from the Job Description appear in the Resume.
     texts = [resume_text, job_text]
-
     vectorizer = TfidfVectorizer(stop_words="english")
-    tfidf = vectorizer.fit_transform(texts)
+    try:
+        tfidf = vectorizer.fit_transform(texts)
+        # Calculate the mathematical similarity between the two texts
+        base_score = cosine_similarity(tfidf[0:1], tfidf[1:2])[0][0]
+    except ValueError:
+        # Handles edge cases where one of the texts is completely empty
+        base_score = 0.0 
+        
+    # --- PHASE 2: Core Skill Multiplier Boost ---
+    # This phase rewards candidates significantly for matching explicitly requested "Core Skills"
+    
+    # Extract clean, base-form words from all three bodies of text
+    resume_lemmas = set(_normalize_words_spacy(resume_text))
+    job_desc_lemmas = set(_normalize_words_spacy(job_text))
+    skill_words = set(_normalize_words_spacy(job_skills))
+    
+    # Decide what our "Target Words" are for calculating what the user missed.
+    # We heavily prioritize the exact "skills" string provided by the recruiter.
+    target_words = skill_words if skill_words else job_desc_lemmas
+    
+    # If the recruiter provided core skills, calculate the boost
+    skill_boost = 0.0
+    matched_skills = 0
+    if skill_words:
+        for skill in skill_words:
+            # If a strict skill required by the job is found in the resume, add 5% to their final score!
+            if skill in resume_lemmas:
+                matched_skills += 1
+                skill_boost += 0.05 
+                
+    # Combine the Frequency Score with the Skill Boost. Cap it at 1.0 (100%).
+    final_score = min(1.0, base_score + skill_boost)
+    percent = round(final_score * 100, 2)
 
-    score = cosine_similarity(tfidf[0:1], tfidf[1:2])[0][0]
-    percent = round(score * 100, 2)
+    # --- PHASE 3: Identify Missing Keywords ---
+    # Subtract the words the user has from the words the job wants.
+    # Sort them by length (longer words are usually more specific technical terms)
+    missing = sorted(target_words - resume_lemmas, key=len, reverse=True)
 
-    resume_words = set(_normalize_words(resume_text))
-    job_words = set(_normalize_words(job_text))
-    missing = sorted(job_words - resume_words, key=len, reverse=True)
-
+    # Return the final percentage, and the top 20 missing words to show the user
     return percent, missing[:20]
 
 
@@ -151,6 +219,13 @@ def resume_quality_score(resume_text):
         score += 12
     else:
         feedback.append("Include quantified outcomes (e.g., increased X by 25%).")
+        
+    # Check for Experience Duration markers (e.g. 2020 - 2023, Jan 2021 to Present)
+    date_ranges = re.findall(r"(20\d{2}|\b\d{4}\b)\s*(?:-|to)\s*(20\d{2}|\b\d{4}\b|present|current)", lower)
+    if len(date_ranges) >= 1:
+        score += 10
+    else:
+        feedback.append("Include clear date ranges for your experience (e.g., 2021 - Present).")
 
     if len(text.split()) >= 180:
         score += 10

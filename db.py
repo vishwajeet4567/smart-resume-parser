@@ -1,5 +1,10 @@
 import sqlite3
 
+"""
+Database Helper Module
+Contains functions to initialize the SQLite database schema
+and establish connections to it.
+"""
 
 def init_db():
     conn = sqlite3.connect("database.db", timeout=10)

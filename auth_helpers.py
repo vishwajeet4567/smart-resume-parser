@@ -2,6 +2,10 @@ from flask import session
 
 from db import get_db_connection
 
+"""
+Authentication & Profile Helpers
+Provides utility functions for role-based access control and fetching student profiles.
+"""
 
 def role_required(role):
     return "user" in session and session.get("role") == role

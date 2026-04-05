@@ -1,0 +1,20 @@
+import docx
+
+doc = docx.Document()
+doc.add_heading('John Doe', 0)
+doc.add_paragraph('Phone: 123-456-7890 | Email: john.doe@example.com')
+doc.add_heading('Professional Summary', level=1)
+doc.add_paragraph('Experienced software developer with a strong background in web technologies and NLP, focusing on high-quality delivery and collaboration.')
+doc.add_heading('Experience', level=1)
+doc.add_paragraph('Software Engineer at Tech Corp (2020 - 2023)')
+doc.add_paragraph('- Developed scalable web applications using React.')
+doc.add_paragraph('- Implemented backend logic using Python and Flask.')
+doc.add_paragraph('- Increased system performance by 25%.')
+doc.add_heading('Core Skills', level=1)
+doc.add_paragraph('Languages: Python, JavaScript')
+doc.add_paragraph('Frameworks/Libraries: React, Flask, scikit-learn, spacy')
+doc.add_heading('Education', level=1)
+doc.add_paragraph('B.S. in Computer Science - University of Technology, 2019')
+
+doc.save('dummy_resume.docx')
+print("dummy_resume.docx created successfully!")
